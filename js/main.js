@@ -56,12 +56,12 @@
             addMsg("Подключение к серверу...", "con");
             connecting = true;
         }
-        sock = new SockJS('//anon.chatovod.ru/socket', null, {
-            debug: true//,
-//            protocols_whitelist: [
-                /*'websocket'*//*, 'xdr-streaming', 'xhr-streaming', 'iframe-eventsource', 'iframe-htmlfile', 'xdr-polling',*/
-                /*'xhr-polling'*//*, 'iframe-xhr-polling', 'jsonp-polling'*/
-//            ]
+        sock = new SockJS((location.protocol=="https:"?"https:":"http:")+'//anon.chatovod.ru/socket', null, {
+            debug: true/*,
+            protocols_whitelist: [
+                'websocket', 'xdr-streaming', 'xhr-streaming', 'iframe-eventsource', 'iframe-htmlfile', 'xdr-polling',
+                'xhr-polling', 'iframe-xhr-polling', 'jsonp-polling'
+            ]*/
         });
         sock.onopen = function () {
             connecting = false;
