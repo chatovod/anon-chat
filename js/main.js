@@ -1,4 +1,6 @@
 (function() {
+    var sock = null;
+    var heartbeatTimeoutFuture;
     var textNode;
     var messagesNode;
     var nextNode;
@@ -10,6 +12,9 @@
     var connecting = false;
     var writing = false;
 
+    /**
+     * On document ready
+      */
     $(function() {
         textNode = $("#text");
         sendButtonNode = $("#sendButton");
@@ -49,9 +54,11 @@
         reconnect();
     });
 
-    var sock = null;
+    /**
+     * Common functions
+     */
 
-    var reconnect = function() {
+    function reconnect() {
         if (!connecting) {
             addMsg("Подключение к серверу...", "con");
             connecting = true;
@@ -66,17 +73,19 @@
         sock.onopen = function () {
             connecting = false;
             addMsg("Ожидание нового собеседника...", "sys");
+            resetHeartbeatTimeout();
             sock.send("1");
         };
 
         sock.onclose = function () {
-            sock.close();
+            cancelHeartbeatTimeout();
             sock = null;
             setReadyToSend(false);
             setTimeout(reconnect, 3000);
         };
 
         sock.onmessage = function (e) {
+            resetHeartbeatTimeout();
             var data = e.data;
             var cmd = data.charAt(0);
             switch (cmd) {
@@ -118,6 +127,28 @@
                     break;
             }
         };
+
+        sock.onheartbeat = resetHeartbeatTimeout;
+    };
+
+    function resetHeartbeatTimeout() {
+        if (heartbeatTimeoutFuture) {
+            clearTimeout(heartbeatTimeoutFuture);
+        }
+        heartbeatTimeoutFuture = setTimeout(heartbeatTimeout, 60000);
+    };
+
+    function cancelHeartbeatTimeout() {
+        if (heartbeatTimeoutFuture) {
+            clearTimeout(heartbeatTimeoutFuture);
+            heartbeatTimeoutFuture = null;
+        }
+    };
+
+    function heartbeatTimeout() {
+        addMsg("Потеряна связь с сервером.", "con");
+        sock.close();
+        heartbeatTimeoutFuture = null;
     };
 
     function setReadyToSend(value) {
