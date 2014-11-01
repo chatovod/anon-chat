@@ -63,7 +63,7 @@
             addMsg("Подключение к серверу...", "con");
             connecting = true;
         }
-        sock = new SockJS((location.protocol=="https:"?"https:":"http:")+'//anon.chatovod.ru/socket', null, {
+        sock = new SockJS('https://anon.chatovod.ru/socket', null, {
             debug: true/*,
             protocols_whitelist: [
                 'websocket', 'xdr-streaming', 'xhr-streaming', 'iframe-eventsource', 'iframe-htmlfile', 'xdr-polling',
